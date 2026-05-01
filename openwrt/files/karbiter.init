@@ -1,0 +1,22 @@
+#!/bin/sh /etc/rc.common
+
+START=95
+USE_PROCD=1
+
+start_service() {
+	local addr token cert key
+
+	config_load karbiter
+	config_get addr main addr ':9443'
+	config_get token main token ''
+	config_get cert main cert ''
+	config_get key main key ''
+
+	procd_open_instance
+	procd_set_param command /usr/bin/karbiter --addr "$addr"
+	[ -n "$token" ] && procd_append_param command --token "$token"
+	[ -n "$cert" ] && procd_append_param command --cert "$cert"
+	[ -n "$key" ] && procd_append_param command --key "$key"
+	procd_set_param respawn
+	procd_close_instance
+}
